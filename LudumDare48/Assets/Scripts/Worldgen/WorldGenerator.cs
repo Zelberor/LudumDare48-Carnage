@@ -9,8 +9,9 @@ public class WorldGenerator : MonoBehaviour
 	public Material wallRenderMaterial;
 	public Material doorRenderMaterial;
 	public Vector3 startingDimensions;
-    private float currentFloorHeight = 0f;
-	private Room room = null;
+	public float trapDoorThickness;
+	private Room currentRoom = null;
+	private List<Room> rooms;
 
     void Start()
     {
@@ -19,7 +20,15 @@ public class WorldGenerator : MonoBehaviour
 		RoomTools.wallRenderMaterial = this.wallRenderMaterial;
 		RoomTools.doorRenderMaterial = this.doorRenderMaterial;
 		RoomTools.entityParent = new GameObject("WorldGeneratorEntities");
+		RoomTools.trapDoorThickness = this.trapDoorThickness;
 
-		room = new Room(startingDimensions, 0f);
+		Vector3 testDimensions = new Vector3(15, 5, 20);
+
+		currentRoom = new Room(startingDimensions, 0f);
+		currentRoom = currentRoom.createNextRoom(testDimensions, 15f);
     }
+
+	public Room getCurrentRoom() {
+		return currentRoom;
+	}
 }

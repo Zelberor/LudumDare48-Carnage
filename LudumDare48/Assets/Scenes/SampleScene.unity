@@ -340,7 +340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd95d41e51ee31b42b0f0367a8d2e50b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallPhysicMaterial: {fileID: 0}
+  wallPhysicMaterial: {fileID: 13400000, guid: a7b261332cc80d245959f4a1e22de458, type: 2}
   doorPhysicMaterial: {fileID: 0}
   wallRenderMaterial: {fileID: 2100000, guid: 19c601b9f7a2c77438763d1a3f5cb107, type: 2}
   doorRenderMaterial: {fileID: 0}
