@@ -33,8 +33,8 @@ public class TrapDoor : MonoBehaviour
 	}
 
 	public void openTrapDoor() {
-		zPlusDoorGoal = new Vector3(0f, 0f, xzDimensions.y/2 + 0.1f);
-		zMinusDoorGoal = new Vector3(0f, 0f, - (xzDimensions.y/2 + 0.1f));
+		zPlusDoorGoal = new Vector3(0f, 0f, xzDimensions.y/2 + 0.5f);
+		zMinusDoorGoal = new Vector3(0f, 0f, - (xzDimensions.y/2 + 0.5f));
 	}
 
     // Update is called once per frame

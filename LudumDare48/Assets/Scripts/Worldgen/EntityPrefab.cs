@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class EntityPrefab {
 	private GameObject prefab;
@@ -12,17 +13,27 @@ public class EntityPrefab {
 		this.maxEntities = maxEntities;
 	}
 
-	public GameObject rollAndInstanceEntity() {
-		GameObject entity = null;
-		float rnd = Random.Range(0.0f, 1.0f);
-		if (rnd <= prob && currentCount < maxEntities) {
-			entity = GameObject.Instantiate<GameObject>(prefab, RoomTools.entityParent.transform);
+	public GameObject getInstance() {
+		if (currentCount < maxEntities) {
 			++currentCount;
+			return GameObject.Instantiate<GameObject>(prefab, RoomTools.entityParent.transform);
 		}
-		return entity;
+		return null;
 	}
 
 	public void entityDestroyed() {
 		--currentCount;
+	}
+
+	public float getProbability() {
+		int countDiff = Math.Abs(maxEntities - currentCount);
+		if (countDiff < maxEntities / 4) {
+			float inverseCountDiff = maxEntities / 4 - countDiff;
+			float normalizedCountDiff = inverseCountDiff / (float) (maxEntities / 4);
+			float reducedProb = prob - normalizedCountDiff * prob;
+			Debug.Log("Reduced Prob: " + reducedProb + " cur: " + currentCount + " max: " + maxEntities);
+			return reducedProb;
+		}
+		return prob;
 	}
 }

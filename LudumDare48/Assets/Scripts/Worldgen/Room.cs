@@ -247,14 +247,16 @@ public static class RoomTools {
 	}
 
 	public static GameObject rollAndInstanceEntity() {
-		GameObject entity = null;
+		float rnd = UnityEngine.Random.Range(0.0f, 1.0f);
+		float baseProb = 0f;
 		foreach (var item in spawnEntities)
 		{
-			entity = item.Value.rollAndInstanceEntity();
-			if (entity != null)
-				return entity;
+			if (rnd <= item.Value.getProbability() + baseProb) {
+				return item.Value.getInstance();
+			}
+			baseProb += item.Value.getProbability();
 		}
-		return entity;
+		return null;
 	}
 
 	public static void entityDestroyed(string name) {
