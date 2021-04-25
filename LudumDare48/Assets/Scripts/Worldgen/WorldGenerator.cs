@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class WorldGenerator : MonoBehaviour
 {
@@ -24,10 +25,13 @@ public class WorldGenerator : MonoBehaviour
 	public float chainsawNoseProb;
 	public GameObject cratePrefab;
 	public float crateProb;
+	public int maxCrates;
 	public int maxRooms = 10;
 
 	private Room currentRoom = null;
 	private List<Room> rooms = new List<Room>();
+
+	private NavMeshSurface navMesh = null;
 
     void Start()
     {
@@ -51,7 +55,7 @@ public class WorldGenerator : MonoBehaviour
 		rooms.Add(currentRoom);
 
 		//spawnEntities.Add(chainsawNoseProb, chainsawNosePrefab);
-		RoomTools.spawnEntities.Add(crateProb, cratePrefab);
+		RoomTools.spawnEntities.Add("Crate", new EntityPrefab(cratePrefab, crateProb, maxCrates));
 
 		goToNextRoom();
 		goToNextRoom();
@@ -78,8 +82,23 @@ public class WorldGenerator : MonoBehaviour
 		rooms.Add(currentRoom);
 		if (rooms.Count > maxRooms) {
 			//Add proper Destroy
+			rooms[0].DestroyRoom();
 			rooms.RemoveAt(0);
 		}
+		updateNavMesh();
 		oldRoom.openTrapDoor();
+	}
+
+	private void updateNavMesh() {
+		if (navMesh == null) {
+			navMesh = this.gameObject.AddComponent<NavMeshSurface>();
+			navMesh.collectObjects = CollectObjects.Volume;
+		}
+		Vector3 currentDimensions = getCurrentRoom().getDimensions();
+		float currentFloorHeight = getCurrentRoom().getFloorHeight();
+		navMesh.navMeshData = null;
+		navMesh.size = currentDimensions * 1.2f;
+		navMesh.center = new Vector3(0f, currentFloorHeight + currentDimensions.y/2, 0f);
+		navMesh.BuildNavMesh();
 	}
 }

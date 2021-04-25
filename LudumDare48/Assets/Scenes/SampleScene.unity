@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 847583806}
   - component: {fileID: 847583805}
+  - component: {fileID: 847583807}
   m_Layer: 0
   m_Name: WorldGenerator
   m_TagString: Untagged
@@ -157,7 +158,7 @@ MonoBehaviour:
   wallRenderMaterial: {fileID: 2100000, guid: 19c601b9f7a2c77438763d1a3f5cb107, type: 2}
   doorRenderMaterial: {fileID: 2100000, guid: 9b480c63cd630e1418176ee190dde60b, type: 2}
   startingDimensions: {x: 10, y: 3, z: 10}
-  trapDoorThickness: 0.2
+  trapDoorThickness: 0.5
   doorSpeed: 1
   biggerModeProb: 0.2
   smallerModeProb: 0.3
@@ -169,6 +170,8 @@ MonoBehaviour:
   chainsawNoseProb: 0
   cratePrefab: {fileID: 5377028126965305519, guid: 5e5bed43960034d468124bca6dbdbb1e, type: 3}
   crateProb: 0.05
+  maxCrates: 150
+  maxRooms: 10
 --- !u!4 &847583806
 Transform:
   m_ObjectHideFlags: 0
@@ -183,6 +186,35 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &847583807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 847583804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AgentTypeID: 0
+  m_CollectObjects: 1
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 1
+  m_DefaultArea: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_BuildHeightMesh: 0
+  m_NavMeshData: {fileID: 0}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0

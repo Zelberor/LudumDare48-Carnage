@@ -151,8 +151,6 @@ public class Room {
 		transitionHeight = Math.Max(Math.Abs(nextRoomDimensions.x - this.dimensions.x), Math.Abs(nextRoomDimensions.z - this.dimensions.z)) / 2 + transitionRnd;
 		transitionHeight = Math.Max(RoomTools.minTransition, transitionHeight);
 
-		Debug.Log(color);
-
 		return createNextRoom(nextRoomDimensions, transitionHeight, color);
 	}
 
@@ -201,6 +199,10 @@ public class Room {
 	public int getID() {
 		return id;
 	}
+
+	public void DestroyRoom() {
+		GameObject.Destroy(roomObj, 2f);
+	}
 }
 
 public static class RoomTools {
@@ -223,15 +225,16 @@ public static class RoomTools {
 	public static float transitionVariation;
 	public static float minTransition;
 
-	public static Dictionary<float, GameObject> spawnEntities = new Dictionary<float, GameObject>();
+	public static Dictionary<string, EntityPrefab> spawnEntities = new Dictionary<string, EntityPrefab>();
 
-	public static void addMeshWithCol(GameObject host, Mesh mesh, Material renderMaterial, PhysicMaterial physicMaterial) {
+	public static void addMeshWithCol(GameObject host, Mesh mesh, Material renderMaterial, PhysicMaterial physicMaterial, bool convex = false) {
 		MeshFilter mFilter = host.AddComponent<MeshFilter>();
 		mFilter.mesh = mesh;
 		MeshRenderer renderer = host.AddComponent<MeshRenderer>();
 		renderer.material = renderMaterial;
 		MeshCollider collider = host.AddComponent<MeshCollider>();
 		collider.material = physicMaterial;
+		collider.convex = convex;
 	}
 
 	public static void addKinematicRigidbody(GameObject host) {
@@ -245,16 +248,20 @@ public static class RoomTools {
 		GameObject entity = null;
 		foreach (var item in spawnEntities)
 		{
-			float rnd = UnityEngine.Random.Range(0.0f, 1.0f);
-			if (rnd <= item.Key) {
-				entity = item.Value;
+			entity = item.Value.rollAndInstanceEntity();
+			if (entity != null)
 				break;
-			}
 		}
-		if (entity == null)
-			return null;
-		GameObject instance = GameObject.Instantiate<GameObject>(entity, entityParent.transform);
-		return instance;
+		return entity;
+	}
+
+	public static void entityDestroyed(string name) {
+		EntityPrefab ePrefab = null;
+		if (spawnEntities.TryGetValue(name, out ePrefab)) {
+			ePrefab.entityDestroyed();
+		} else {
+			Debug.LogError("entityDestroyed: error: EntityPrefab " + name + " does not exist");
+		}
 	}
 
 	public static Color getRndLightColor() {
@@ -289,7 +296,7 @@ public static class RoomTools {
 			rndY = UnityEngine.Random.Range((int) RoomTools.minDimensions.y, (int) RoomTools.maxDimensions.y);
 		else
 			rndY = UnityEngine.Random.Range((int) minDimensions.y, (int) maxDimensions.y);
-		rndY = (rndY >> 1) << 1; //make power of 2
+		//rndY = (rndY >> 1) << 1; //make power of 2 -- not needed
 		return new Vector3(rndX, rndY, rndZ);
 	}
 }

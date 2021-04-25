@@ -13,10 +13,10 @@ public class TrapDoor : MonoBehaviour
 	private Vector3 zMinusDoorGoal = Vector3.zero;
 
 	public void externalConstructor(Vector2 xzDimensions) {
-		zPlusDoor = new GameObject();
+		zPlusDoor = new GameObject("zPlusDoor");
 		zPlusDoor.transform.SetParent(this.transform);
 		zPlusDoor.transform.localPosition = Vector3.zero;
-		zMinusDoor = new GameObject();
+		zMinusDoor = new GameObject("zMinusDoor");
 		zMinusDoor.transform.SetParent(this.transform);
 		zMinusDoor.transform.localPosition = Vector3.zero;
 
@@ -24,9 +24,9 @@ public class TrapDoor : MonoBehaviour
 	}
 
 	public void setDoorMesh(Mesh mesh) {
-		RoomTools.addMeshWithCol(zPlusDoor, mesh, RoomTools.doorRenderMaterial, RoomTools.doorPhysicMaterial);
+		RoomTools.addMeshWithCol(zPlusDoor, mesh, RoomTools.doorRenderMaterial, RoomTools.doorPhysicMaterial, true);
 		RoomTools.addKinematicRigidbody(zPlusDoor);
-		RoomTools.addMeshWithCol(zMinusDoor, mesh, RoomTools.doorRenderMaterial, RoomTools.doorPhysicMaterial);
+		RoomTools.addMeshWithCol(zMinusDoor, mesh, RoomTools.doorRenderMaterial, RoomTools.doorPhysicMaterial, true);
 		RoomTools.addKinematicRigidbody(zMinusDoor);
 		//Rotate zMinusDoor
 		zMinusDoor.transform.Rotate(new Vector3(0f, 180f, 0f));
@@ -41,10 +41,10 @@ public class TrapDoor : MonoBehaviour
     void Update()
     {
         if (zPlusDoorGoal != zPlusDoor.transform.localPosition) {
-			zPlusDoor.transform.localPosition = Vector3.Lerp(zPlusDoor.transform.position, zPlusDoorGoal, Time.deltaTime * RoomTools.doorSpeed);
+			zPlusDoor.transform.localPosition = Vector3.Lerp(zPlusDoor.transform.localPosition, zPlusDoorGoal, Time.deltaTime * RoomTools.doorSpeed);
 		}
 		if (zMinusDoorGoal != zMinusDoor.transform.localPosition) {
-			zMinusDoor.transform.localPosition = Vector3.Lerp(zMinusDoor.transform.position, zMinusDoorGoal, Time.deltaTime * RoomTools.doorSpeed);
+			zMinusDoor.transform.localPosition = Vector3.Lerp(zMinusDoor.transform.localPosition, zMinusDoorGoal, Time.deltaTime * RoomTools.doorSpeed);
 		}
     }
 }
