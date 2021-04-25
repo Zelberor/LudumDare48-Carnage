@@ -62,7 +62,7 @@ public class QuadMesh {
 		return true;
 	}
 
-	public Mesh GetMesh() {
+	public Mesh getMesh() {
 		Mesh mesh = new Mesh();
 		mesh.vertices = this.vertices.ToArray();
 		mesh.uv = this.uvs.ToArray();
