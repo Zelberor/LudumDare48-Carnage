@@ -140,10 +140,12 @@ public class Room {
 
 		float transitionRnd = UnityEngine.Random.Range(-RoomTools.transitionVariation/2, RoomTools.transitionVariation/2);
 
-		if(UnityEngine.Random.Range(0.0f, 1.0f) <= RoomTools.biggerModeProb) {
+		float rnd = UnityEngine.Random.Range(0.0f, 1.0f);
+
+		if(rnd <= RoomTools.biggerModeProb) {
 			color = RoomTools.getRndLightColor();
 			nextRoomDimensions = RoomTools.getRndDimensions(this.dimensions, RoomTools.maxDimensions);
-		} else if (UnityEngine.Random.Range(0.0f, 1.0f) <= RoomTools.smallerModeProb) {
+		} else if (rnd <= RoomTools.biggerModeProb + RoomTools.smallerModeProb) {
 			color = RoomTools.getRndLightColor();
 			nextRoomDimensions = RoomTools.getRndDimensions(RoomTools.minDimensions, this.dimensions);
 		}
@@ -250,7 +252,7 @@ public static class RoomTools {
 		{
 			entity = item.Value.rollAndInstanceEntity();
 			if (entity != null)
-				break;
+				return entity;
 		}
 		return entity;
 	}

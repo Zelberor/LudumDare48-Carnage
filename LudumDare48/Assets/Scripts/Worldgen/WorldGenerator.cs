@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -23,6 +24,7 @@ public class WorldGenerator : MonoBehaviour
 
 	public GameObject chainsawNosePrefab;
 	public float chainsawNoseProb;
+	public int maxChainsawNoses;
 	public GameObject cratePrefab;
 	public float crateProb;
 	public int maxCrates;
@@ -54,20 +56,9 @@ public class WorldGenerator : MonoBehaviour
 		currentRoom = new Room(startingDimensions, 0f, Color.white);
 		rooms.Add(currentRoom);
 
-		//spawnEntities.Add(chainsawNoseProb, chainsawNosePrefab);
 		RoomTools.spawnEntities.Add("Crate", new EntityPrefab(cratePrefab, crateProb, maxCrates));
+		RoomTools.spawnEntities.Add("ChainsawNose", new EntityPrefab(chainsawNosePrefab, chainsawNoseProb, maxChainsawNoses));
 
-		goToNextRoom();
-		goToNextRoom();
-		goToNextRoom();
-		goToNextRoom();
-		goToNextRoom();
-		goToNextRoom();
-		goToNextRoom();
-		goToNextRoom();
-		goToNextRoom();
-		goToNextRoom();
-		goToNextRoom();
 		goToNextRoom();
 		goToNextRoom();
     }
@@ -85,20 +76,28 @@ public class WorldGenerator : MonoBehaviour
 			rooms[0].DestroyRoom();
 			rooms.RemoveAt(0);
 		}
-		updateNavMesh();
+		updateNavMesh(oldRoom);
 		oldRoom.openTrapDoor();
 	}
 
-	private void updateNavMesh() {
+	private void updateNavMesh(Room oldRoom) {
+		float overlap = 0.5f;
 		if (navMesh == null) {
 			navMesh = this.gameObject.AddComponent<NavMeshSurface>();
 			navMesh.collectObjects = CollectObjects.Volume;
+			navMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
 		}
 		Vector3 currentDimensions = getCurrentRoom().getDimensions();
+		Vector3 oldDimensions = oldRoom.getDimensions();
 		float currentFloorHeight = getCurrentRoom().getFloorHeight();
+		float oldFloorHeight = oldRoom.getFloorHeight();
 		navMesh.navMeshData = null;
-		navMesh.size = currentDimensions * 1.2f;
-		navMesh.center = new Vector3(0f, currentFloorHeight + currentDimensions.y/2, 0f);
+		float maxXDimension = Math.Max(currentDimensions.x, oldDimensions.x);
+		float maxZDimension = Math.Max(currentDimensions.z, oldDimensions.z);
+		float combinedHeight = Math.Abs(oldFloorHeight - currentFloorHeight) + oldDimensions.y;
+		Vector3 navSize = new Vector3(maxXDimension + overlap, combinedHeight, maxZDimension + overlap);
+		navMesh.size = navSize;
+		navMesh.center = new Vector3(0f, currentFloorHeight + navSize.y/2 - overlap - trapDoorThickness, 0f);
 		navMesh.BuildNavMesh();
 	}
 }
