@@ -24,8 +24,10 @@ public class WorldGenerator : MonoBehaviour
 	public float chainsawNoseProb;
 	public GameObject cratePrefab;
 	public float crateProb;
+	public int maxRooms = 10;
+
 	private Room currentRoom = null;
-	private List<Room> rooms;
+	private List<Room> rooms = new List<Room>();
 
     void Start()
     {
@@ -46,24 +48,38 @@ public class WorldGenerator : MonoBehaviour
 		Vector3 testDimensions = new Vector3(15, 5, 20);
 
 		currentRoom = new Room(startingDimensions, 0f, Color.white);
+		rooms.Add(currentRoom);
 
 		//spawnEntities.Add(chainsawNoseProb, chainsawNosePrefab);
 		RoomTools.spawnEntities.Add(crateProb, cratePrefab);
 
-		getCurrentRoom().openTrapDoor();
-
-		currentRoom = currentRoom.createRandNextRoom();
-		currentRoom = currentRoom.createRandNextRoom();
-		currentRoom = currentRoom.createRandNextRoom();
-		currentRoom = currentRoom.createRandNextRoom();
-		currentRoom = currentRoom.createRandNextRoom();
-		currentRoom = currentRoom.createRandNextRoom();
-		currentRoom = currentRoom.createRandNextRoom();
-		currentRoom = currentRoom.createRandNextRoom();
-
+		goToNextRoom();
+		goToNextRoom();
+		goToNextRoom();
+		goToNextRoom();
+		goToNextRoom();
+		goToNextRoom();
+		goToNextRoom();
+		goToNextRoom();
+		goToNextRoom();
+		goToNextRoom();
+		goToNextRoom();
+		goToNextRoom();
+		goToNextRoom();
     }
 
 	public Room getCurrentRoom() {
 		return currentRoom;
+	}
+
+	public void goToNextRoom() {
+		Room oldRoom = getCurrentRoom();
+		currentRoom = currentRoom.createRandNextRoom();
+		rooms.Add(currentRoom);
+		if (rooms.Count > maxRooms) {
+			//Add proper Destroy
+			rooms.RemoveAt(0);
+		}
+		oldRoom.openTrapDoor();
 	}
 }

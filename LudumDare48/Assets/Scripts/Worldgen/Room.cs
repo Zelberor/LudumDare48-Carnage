@@ -197,6 +197,10 @@ public class Room {
 	public float getFloorHeight() {
 		return floorHeight;
 	}
+
+	public int getID() {
+		return id;
+	}
 }
 
 public static class RoomTools {
