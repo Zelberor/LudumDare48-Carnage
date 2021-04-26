@@ -7,13 +7,16 @@ public class EntityPrefab {
 	private int maxEntities;
 	private int currentCount = 0;
 
-	public EntityPrefab(GameObject prefab, float probability, int maxEntities) {
+	public EntityPrefab(GameObject prefab, float probability, int maxEntities = -1) {
 		this.prefab = prefab;
 		this.prob = probability;
 		this.maxEntities = maxEntities;
 	}
 
 	public GameObject getInstance() {
+		if (maxEntities < 0) {
+			return GameObject.Instantiate<GameObject>(prefab, RoomTools.entityParent.transform);
+		}
 		if (currentCount < maxEntities) {
 			++currentCount;
 			return GameObject.Instantiate<GameObject>(prefab, RoomTools.entityParent.transform);
@@ -27,7 +30,7 @@ public class EntityPrefab {
 
 	public float getProbability() {
 		int countDiff = Math.Abs(maxEntities - currentCount);
-		if (countDiff < maxEntities / 4) {
+		if (maxEntities > 0 && countDiff < maxEntities / 4) {
 			float inverseCountDiff = maxEntities / 4 - countDiff;
 			float normalizedCountDiff = inverseCountDiff / (float) (maxEntities / 4);
 			float reducedProb = prob - normalizedCountDiff * prob;

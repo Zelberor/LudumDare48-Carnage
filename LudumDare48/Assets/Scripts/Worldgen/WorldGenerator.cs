@@ -28,6 +28,12 @@ public class WorldGenerator : MonoBehaviour
 	public GameObject cratePrefab;
 	public float crateProb;
 	public int maxCrates;
+	public GameObject healthPrefab;
+	public float healthProb;
+	public GameObject damagePrefab;
+	public float damageProb;
+	public GameObject speedPrefab;
+	public float speedProb;
 	public int maxRooms = 10;
 
 	private Room currentRoom = null;
@@ -58,6 +64,10 @@ public class WorldGenerator : MonoBehaviour
 
 		RoomTools.spawnEntities.Add("Crate", new EntityPrefab(cratePrefab, crateProb, maxCrates));
 		RoomTools.spawnEntities.Add("ChainsawNose", new EntityPrefab(chainsawNosePrefab, chainsawNoseProb, maxChainsawNoses));
+
+		RoomTools.spawnEntities.Add("Health", new EntityPrefab(healthPrefab, healthProb));
+		RoomTools.spawnEntities.Add("Damage", new EntityPrefab(damagePrefab, damageProb));
+		RoomTools.spawnEntities.Add("Speed", new EntityPrefab(speedPrefab, speedProb));
     }
 
 	public Room getCurrentRoom() {
