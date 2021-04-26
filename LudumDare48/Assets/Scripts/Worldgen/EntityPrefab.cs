@@ -31,7 +31,7 @@ public class EntityPrefab {
 			float inverseCountDiff = maxEntities / 4 - countDiff;
 			float normalizedCountDiff = inverseCountDiff / (float) (maxEntities / 4);
 			float reducedProb = prob - normalizedCountDiff * prob;
-			Debug.Log("Reduced Prob: " + reducedProb + " cur: " + currentCount + " max: " + maxEntities);
+			//Debug.Log("Reduced Prob: " + reducedProb + " cur: " + currentCount + " max: " + maxEntities);
 			return reducedProb;
 		}
 		return prob;
