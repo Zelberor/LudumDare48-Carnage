@@ -38,6 +38,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2869995096008414324}
     m_Modifications:
+    - target: {fileID: -8971851667448647905, guid: f9ae1f0ee0504314f978c2d4598c61f1, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b8bb258028291bd4dbc62c103d5ce531, type: 2}
     - target: {fileID: -8679921383154817045, guid: f9ae1f0ee0504314f978c2d4598c61f1, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -82,10 +86,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5462409695819062976, guid: f9ae1f0ee0504314f978c2d4598c61f1, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8f9736cbd3af7754a83c545900801479, type: 2}
+    - target: {fileID: -4718603134005644228, guid: f9ae1f0ee0504314f978c2d4598c61f1, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b8bb258028291bd4dbc62c103d5ce531, type: 2}
     - target: {fileID: 919132149155446097, guid: f9ae1f0ee0504314f978c2d4598c61f1, type: 3}
       propertyPath: m_Name
       value: Shotgun-2-remesh
       objectReference: {fileID: 0}
+    - target: {fileID: 1288967930852334329, guid: f9ae1f0ee0504314f978c2d4598c61f1, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9c9b439df71f4a04db780a349bdcafb6, type: 2}
+    - target: {fileID: 2186286944685583073, guid: f9ae1f0ee0504314f978c2d4598c61f1, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8f9736cbd3af7754a83c545900801479, type: 2}
     - target: {fileID: 5866666021909216657, guid: f9ae1f0ee0504314f978c2d4598c61f1, type: 3}
       propertyPath: m_Controller
       value: 
