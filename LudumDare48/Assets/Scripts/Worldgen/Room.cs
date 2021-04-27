@@ -17,7 +17,7 @@ public class Room {
 		this.roomColor = color;
 		this.dimensions = dimensions;
 		this.floorHeight = floorHeight;
-		++Room.id;
+		Room.id = Room.id + 1;
 		roomObj = new GameObject("Room" + Room.id);
 		roomObj.transform.Translate(new Vector3(0f, floorHeight, 0f));
 		this.generate();
@@ -59,7 +59,7 @@ public class Room {
 		light.type = LightType.Point;
 		light.range = Math.Max(dimensions.x, dimensions.z);
 		light.shadows = LightShadows.None;
-		light.intensity = 60/light.range;
+		light.intensity = 70/light.range;
 		light.color = roomColor;
 	}
 
@@ -204,6 +204,10 @@ public class Room {
 
 	public void DestroyRoom() {
 		GameObject.Destroy(roomObj, 2f);
+	}
+
+	public static int getCurrentID() {
+		return Room.id;
 	}
 }
 
