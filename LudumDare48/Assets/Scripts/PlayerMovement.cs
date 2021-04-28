@@ -106,8 +106,11 @@ public class PlayerMovement : MonoBehaviour
         float heightInput = Input.GetAxis("Jump");         //spaaaaaaace
         float walkInput = Input.GetAxis("Vertical");           //ws, vh Vorrrrrrw�rrrts!
         float firePress = Input.GetAxis("Fire1");               //bumm!
-        float mouseXPress = Input.GetAxis("Mouse X");           //drehen
-        float mouseYPress = Input.GetAxis("Mouse Y");           //Kopf nicken
+        float mouseXPress = Input.GetAxisRaw("Mouse X");           //drehen
+        float mouseYPress = Input.GetAxisRaw("Mouse Y");           //Kopf nicken
+
+		Debug.Log("[" + mouseXPress + ", " + mouseYPress + "]");
+
         if (horizontalInpit != 0)
         {
 
@@ -253,63 +256,24 @@ public class PlayerMovement : MonoBehaviour
                 return;
             case "HealthUP":
                 health += 20;
-				other.gameObject.tag = "";
+				other.gameObject.tag = "Empty";
                 GameObject.Destroy( other.gameObject.GetComponentInParent<HealthPickup>().gameObject);
                 //Debug.Log(health);
                 return;
             case "SpeedUP":
                 SpeedUPActive = true;
-				other.gameObject.tag = "";
+				other.gameObject.tag = "Empty";
                 GameObject.Destroy(other.gameObject.GetComponentInParent<SpeedPickup>().gameObject);
                 SpeedUPDuration = 5f;
                 return;
             case "DamageUP":
                 DamageUPActive = true;
-				other.gameObject.tag = "";
+				other.gameObject.tag = "Empty";
                 GameObject.Destroy(other.gameObject.GetComponentInParent<DamagePickup>().gameObject);
                 DamageUPDuration = 5f;
                 return;
-
-
-
-
-
-
-
-
-
-
-
-
-
             default: return;
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         }
        
     }
-
-
-
-
-
-
-
 }

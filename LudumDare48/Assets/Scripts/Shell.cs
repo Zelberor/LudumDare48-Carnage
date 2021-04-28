@@ -7,7 +7,7 @@ public class Shell : MonoBehaviour
 {
     private bool alive =true;
     public CapsuleCollider mcollider;
-    private float livetime = 0.05f;
+    private float livetime = 0.1f;
     private readonly float firepower = 1500;
     bool launched = false;
     public ShellShrapnel shrap; 

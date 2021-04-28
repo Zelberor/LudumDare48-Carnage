@@ -11,7 +11,7 @@ public class ChainsawNose : MonoBehaviour
 
     //private int health = 1000;
     private GameObject[] PowerUPprefabs;
-    private int health=100;
+    private int health=75;
     public Rigidbody rb;
     public NavMeshAgent agent;
     public GameObject player;
@@ -126,7 +126,7 @@ public class ChainsawNose : MonoBehaviour
                     item.enabled = false;
 
                 }
-              ((Shell) other.gameObject).directShellHitOnShell();
+              	((Shell) other.gameObject).directShellHitOnShell();
                 return;
             case "WoodShrapnel":
                 Hit(2);
