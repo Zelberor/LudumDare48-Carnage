@@ -53,12 +53,6 @@ public class PlayerMovement : MonoBehaviour
 		anim = this.GetComponentInChildren<Animator>();
     }
 
-    internal void setMovementEnabelt(bool v)
-    {
-        this.aircontrol = v;
-        
-    }
-
     // Update is called once per frame
     void Update()
     {
@@ -176,7 +170,15 @@ public class PlayerMovement : MonoBehaviour
             head.transform.localRotation = Quaternion.Euler(75, 0, 0);
         }
 
-    	if(aircontrol)
+		Room currentRoom = RoomTools.lastGeneratedRoom;
+		Vector3 currentDimensions = currentRoom.getDimensions();
+		float currentFloorHeight = currentRoom.getFloorHeight();
+		bool playerInsideDimensionXZ = (currentDimensions.x/2 - Mathf.Abs(player.transform.position.x)) > 1.0f && (currentDimensions.z/2 - Mathf.Abs(player.transform.position.z)) > 1.0f;
+		bool playerInsideHeight = (player.transform.position.y - (currentFloorHeight + currentDimensions.y)) < -0.5;
+
+		
+
+    	if(playerInsideHeight || playerInsideDimensionXZ)
    			rg.velocity = vel;
 
 		if (Mathf.Abs(rg.velocity.x) > 0.2f || Mathf.Abs(rg.velocity.z) > 0.2f) {

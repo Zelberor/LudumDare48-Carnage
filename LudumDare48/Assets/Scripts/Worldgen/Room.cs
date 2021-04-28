@@ -21,6 +21,7 @@ public class Room {
 		roomObj = new GameObject("Room" + Room.id);
 		roomObj.transform.Translate(new Vector3(0f, floorHeight, 0f));
 		this.generate();
+		RoomTools.lastGeneratedRoom = this;
 	}
 
 	private bool generate() {
@@ -230,6 +231,7 @@ public static class RoomTools {
 	public static Vector3 minDimensions;
 	public static float transitionVariation;
 	public static float minTransition;
+	public static Room lastGeneratedRoom;
 
 	public static Dictionary<string, EntityPrefab> spawnEntities = new Dictionary<string, EntityPrefab>();
 

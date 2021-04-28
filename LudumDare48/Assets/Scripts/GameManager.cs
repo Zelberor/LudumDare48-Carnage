@@ -36,12 +36,6 @@ public class GameManager : MonoBehaviour
             ttnr -= Time.deltaTime;
             ttnr = (ttnr < 0) ? 0 : ttnr;
             if (ttnr == 0) Next();
-
-            var playery = player.transform.position.y;
-             var height =  worldgen.getCurrentRoom().getDimensions().y;
-            var floorheight = worldgen.getCurrentRoom().getFloorHeight();
-
-            player.setMovementEnabelt(playery <= floorheight + height && playery >= floorheight);
         }
 
     }

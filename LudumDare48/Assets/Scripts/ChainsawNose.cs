@@ -85,7 +85,7 @@ public class ChainsawNose : MonoBehaviour
 			Vector2 xzPlayerPos = new Vector2(player.transform.position.x, player.transform.position.z);
 
 
-			if ((xzPos - xzPlayerPos).magnitude < 2.0f ) {
+			if ((xzPos - xzPlayerPos).magnitude < 2.5f ) {
 				anim.SetTrigger("Attack");
 			}
 		}
