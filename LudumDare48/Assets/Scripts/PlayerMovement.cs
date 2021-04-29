@@ -7,7 +7,9 @@ public class PlayerMovement : MonoBehaviour
     public GameObject player;
     public GameObject head;
     public Shotgun shotty;
-    private float movingSpeed = 10f;
+    private float movingSpeed; //gets set in script
+	private float axisAcceleration = 10f;
+	private Vector3 lastTargetVelocityXZ = Vector3.zero;
     public bool isGrounded = true;
 	public float groundedTimeout = 0f;
     public float health { get; private set; }
@@ -35,13 +37,9 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         sensitivity = 1f;
-        //   cam = GameObject.Find("PlayerMain").GetComponentInChildren<Camera>();
-
         health = 100;
         rg = GetComponent<Rigidbody>();
         player = GameObject.FindWithTag("Player");
-        // gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
-        //   cam = Camera.main;
 		anim = this.GetComponentInChildren<Animator>();
     }
 
@@ -95,15 +93,15 @@ public class PlayerMovement : MonoBehaviour
 			movingSpeed = (isGrounded) ? 10f : 5f;
 		}
 
-        float horizontalInput = Input.GetAxisRaw("Horizontal"); // ad , lr sidestep
+        float lrInput = Input.GetAxisRaw("Horizontal");
+		float fbInput = Input.GetAxisRaw("Vertical");
 		bool jumpInput = Input.GetButtonDown("Jump");
 		bool jumpInputHold = Input.GetButton("Jump");
-        float walkInput = Input.GetAxisRaw("Vertical");           //ws, vh Vorrrrrrw�rrrts!
-        float firePress = Input.GetAxisRaw("Fire1");               //bumm!
-        float mouseXPress = Input.GetAxisRaw("Mouse X");           //drehen
-        float mouseYPress = Input.GetAxisRaw("Mouse Y");           //Kopf nicken
+        float firePress = Input.GetAxisRaw("Fire1");
+        float mouseXPress = Input.GetAxisRaw("Mouse X");
+        float mouseYPress = Input.GetAxisRaw("Mouse Y");
 
-        targetVelocityXZ = new Vector3(targetVelocityXZ.x + horizontalInput, targetVelocityXZ.y, targetVelocityXZ.z + walkInput);
+        targetVelocityXZ = new Vector3(targetVelocityXZ.x + lrInput, targetVelocityXZ.y, targetVelocityXZ.z + fbInput);
 
         if (firePress != 0)
         {
@@ -134,10 +132,12 @@ public class PlayerMovement : MonoBehaviour
 		}
 
         targetVelocityXZ = targetVelocityXZ.normalized * movingSpeed;
+		targetVelocityXZ = Vector3.Lerp(lastTargetVelocityXZ, targetVelocityXZ, axisAcceleration * Time.deltaTime);
+		lastTargetVelocityXZ = targetVelocityXZ;
 
         //MouseX:
         player.transform.Rotate(Vector3.up, mouseXPress*sensitivity,Space.Self);
-        targetVelocityXZ = Quaternion.Euler(0, player.transform.rotation.eulerAngles.y, 0) * targetVelocityXZ;
+        Vector3 rotatedTargetVelocityXZ = Quaternion.Euler(0, player.transform.rotation.eulerAngles.y, 0) * targetVelocityXZ;
       
 		//MouseY:
         head.transform.Rotate(Vector3.left, mouseYPress * sensitivity, Space.Self);
@@ -150,17 +150,23 @@ public class PlayerMovement : MonoBehaviour
             head.transform.localRotation = Quaternion.Euler(75, 0, 0);
         }
 
+
+		bool playerInsideDimensionXZ = true;
+		bool playerInsideHeight = true;
+		bool playerWayTooHigh = false;
 		Room currentRoom = RoomTools.lastGeneratedRoom;
-		Vector3 currentDimensions = currentRoom.getDimensions();
-		float currentFloorHeight = currentRoom.getFloorHeight();
-		bool playerInsideDimensionXZ = (currentDimensions.x/2 - Mathf.Abs(player.transform.position.x)) > 1.0f && (currentDimensions.z/2 - Mathf.Abs(player.transform.position.z)) > 1.0f;
-		bool playerInsideHeight = (player.transform.position.y - (currentFloorHeight + currentDimensions.y)) < -0.5;
-		bool playerWayTooHigh = (player.transform.position.y - (currentFloorHeight + currentDimensions.y)) > currentDimensions.y*2;
+		if (currentRoom != null) {
+			Vector3 currentDimensions = currentRoom.getDimensions();
+			float currentFloorHeight = currentRoom.getFloorHeight();
+			playerInsideDimensionXZ = (currentDimensions.x/2 - Mathf.Abs(player.transform.position.x)) > 1.0f && (currentDimensions.z/2 - Mathf.Abs(player.transform.position.z)) > 1.0f;
+			playerInsideHeight = (player.transform.position.y - (currentFloorHeight + currentDimensions.y)) < -0.5;
+			playerWayTooHigh = (player.transform.position.y - (currentFloorHeight + currentDimensions.y)) > currentDimensions.y*2;
+		}
 
 		
 
     	if(!playerWayTooHigh && (playerInsideHeight || playerInsideDimensionXZ)) {
-   			rg.velocity = new Vector3(targetVelocityXZ.x, rg.velocity.y, targetVelocityXZ.z);
+   			rg.velocity = new Vector3(rotatedTargetVelocityXZ.x, rg.velocity.y, rotatedTargetVelocityXZ.z);
 		}
 
 		if (Mathf.Abs(rg.velocity.x) > 0.2f || Mathf.Abs(rg.velocity.z) > 0.2f) {
@@ -174,7 +180,6 @@ public class PlayerMovement : MonoBehaviour
 			}
 			walkAnim = false;
 		}
-      
     }
 
     private void triggerReloadAnimation()
