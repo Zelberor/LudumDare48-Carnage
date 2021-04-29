@@ -48,8 +48,6 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		Debug.Log(rg.velocity);
-        movingSpeed = (SpeedUPActive) ? 25f : 14f;
         Vector3 targetVelocityXZ = Vector3.zero;
 
 		jumpTime -= Time.deltaTime;
@@ -90,7 +88,13 @@ public class PlayerMovement : MonoBehaviour
 		}
 		if (jumpTime <= 0f)
 			jumpTime = 0f;
-        //float horizontalSpeed;
+		
+		if (SpeedUPActive) {
+        	movingSpeed = 20f;
+		} else {
+			movingSpeed = (isGrounded) ? 10f : 5f;
+		}
+
         float horizontalInput = Input.GetAxisRaw("Horizontal"); // ad , lr sidestep
 		bool jumpInput = Input.GetButtonDown("Jump");
 		bool jumpInputHold = Input.GetButton("Jump");
