@@ -15,6 +15,6 @@ public class SawTurner : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        this.transform.RotateAroundLocal(Vector3.right, rotationSpeed * Time.deltaTime);
+        this.transform.Rotate(Vector3.right, rotationSpeed * Time.deltaTime, Space.Self);
     }
 }

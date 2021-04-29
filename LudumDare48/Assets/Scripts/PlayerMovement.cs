@@ -6,33 +6,25 @@ public class PlayerMovement : MonoBehaviour
     public Rigidbody rg;
     public GameObject player;
     public GameObject head;
-    //   private GameManager gameManager;
     public Shotgun shotty;
     private float movingSpeed = 10f;
-    private readonly float JumpForce = 100.0f;
-    // private readonly float fallingAcceleration = -9.80665f;
-
-
     public bool isGrounded = true;
+	public float groundedTimeout = 0f;
     public float health { get; private set; }
-    // private Camera cam;
-    private float jumplock = 0;
-    //  private float changeLock = 0;
-    Vector3 vel = new Vector3(0, 0, 0);
+	private float jumpTime = 0f;
     private float ImmunityFrames =0;
     private bool immunityFramesActive = false;
     private float cd;
     private bool isloaded = true;
-    private bool aircontrol = true;
     private bool SpeedUPActive = false;
     private float SpeedUPDuration =0f;
     private bool DamageUPActive = false;
     private float DamageUPDuration = 0f;
-    private float PeterCD = 0f;
-	private bool PeterCDDone = true;
+    private float reloadAnimTimeout = 0f;
+	private bool reloadAnimDone = true;
 
-	private float walkStopTime = 0f;
-	private bool walk = false;
+	private float walkAnimStopTime = 0f;
+	private bool walkAnim = false;
 
 	private bool shootReleased = true;
 
@@ -56,20 +48,19 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+		Debug.Log(rg.velocity);
         movingSpeed = (SpeedUPActive) ? 25f : 14f;
-        vel = new Vector3(0, 0, 0);
-        //   rg.gravityScale = 1;
-        isGrounded = ((Mathf.Abs(rg.velocity.y) < 0.001f));
+        Vector3 targetVelocityXZ = Vector3.zero;
+
+		jumpTime -= Time.deltaTime;
         ImmunityFrames -= Time.deltaTime;
-        jumplock -= Time.deltaTime;
         cd -= Time.deltaTime;
         SpeedUPDuration -= Time.deltaTime;
         DamageUPDuration -= Time.deltaTime;
-        PeterCD -= Time.deltaTime;
-		if (walkStopTime >= 0f )
-			walkStopTime -= Time.deltaTime;
-        if (jumplock < 0) jumplock = 0f;
-
+        reloadAnimTimeout -= Time.deltaTime;
+		groundedTimeout -= Time.deltaTime;
+		if (walkAnimStopTime >= 0f )
+			walkAnimStopTime -= Time.deltaTime;
         if (DamageUPDuration < 0)
         {
             DamageUPDuration = 0;
@@ -80,49 +71,36 @@ public class PlayerMovement : MonoBehaviour
             SpeedUPDuration = 0;
             SpeedUPActive = false;
         }
-        if (PeterCD <= 0)
+        if (reloadAnimTimeout <= 0)
         {
-            PeterCD = 0;
+            reloadAnimTimeout = 0;
             if (false == DamageUPActive)
             {
-                PeterSchreibHierDeinenRanzRein();
+                triggerReloadAnimation();
             }
-        
         }
-
         if (ImmunityFrames < 0)
         {
             ImmunityFrames = 0;
             immunityFramesActive = false;
         }
+		if (groundedTimeout <= 0f) {
+			groundedTimeout = 0f;
+			isGrounded = false;
+		}
+		if (jumpTime <= 0f)
+			jumpTime = 0f;
         //float horizontalSpeed;
-        float horizontalInpit = Input.GetAxis("Horizontal"); // ad , lr sidestep
-        float heightInput = Input.GetAxis("Jump");         //spaaaaaaace
-        float walkInput = Input.GetAxis("Vertical");           //ws, vh Vorrrrrrw�rrrts!
-        float firePress = Input.GetAxis("Fire1");               //bumm!
+        float horizontalInput = Input.GetAxisRaw("Horizontal"); // ad , lr sidestep
+		bool jumpInput = Input.GetButtonDown("Jump");
+		bool jumpInputHold = Input.GetButton("Jump");
+        float walkInput = Input.GetAxisRaw("Vertical");           //ws, vh Vorrrrrrw�rrrts!
+        float firePress = Input.GetAxisRaw("Fire1");               //bumm!
         float mouseXPress = Input.GetAxisRaw("Mouse X");           //drehen
         float mouseYPress = Input.GetAxisRaw("Mouse Y");           //Kopf nicken
 
-		Debug.Log("[" + mouseXPress + ", " + mouseYPress + "]");
+        targetVelocityXZ = new Vector3(targetVelocityXZ.x + horizontalInput, targetVelocityXZ.y, targetVelocityXZ.z + walkInput);
 
-        if (horizontalInpit != 0)
-        {
-
-            var looking_dir = (int)Input.GetAxisRaw("Horizontal");
-            vel = new Vector3(vel.x + looking_dir, vel.y, vel.z);
-
-
-
-        }
-        if (walkInput != 0)
-        {
-
-            var walkingforward = (int)Input.GetAxisRaw("Vertical");
-            vel = new Vector3(vel.x, vel.y, vel.z + walkingforward);
-
-
-
-        }
         if (firePress != 0)
         {
             Shoot();
@@ -139,34 +117,32 @@ public class PlayerMovement : MonoBehaviour
 				shootReleased = false;
             }
         }
-        if (jumplock == 0 && isGrounded)
-        {
-            rg.AddForce(new Vector2(0, (JumpForce * heightInput * rg.mass)));
 
-        }
+		//Jumping
+        if (jumpInput && isGrounded) {
+			Debug.Log("Jump");
+			jumpTime = 0.3f;
+        } else if (!jumpInputHold) {
+			jumpTime = 0f;
+		}
+		if (jumpTime > 0 && jumpInputHold) {
+			rg.velocity = new Vector3(rg.velocity.x, 5f, rg.velocity.z);
+		}
 
-        vel = vel.normalized * movingSpeed;
+        targetVelocityXZ = targetVelocityXZ.normalized * movingSpeed;
 
         //MouseX:
-
         player.transform.Rotate(Vector3.up, mouseXPress*sensitivity,Space.Self);
-        vel = Quaternion.Euler(0, player.transform.rotation.eulerAngles.y, 0) * vel;
-        vel = new Vector3(vel.x, rg.velocity.y, vel.z);
+        targetVelocityXZ = Quaternion.Euler(0, player.transform.rotation.eulerAngles.y, 0) * targetVelocityXZ;
       
-
+		//MouseY:
         head.transform.Rotate(Vector3.left, mouseYPress * sensitivity, Space.Self);
-
-
-
-        
         if (head.transform.localRotation.eulerAngles.x < 285 && head.transform.localRotation.eulerAngles.x > 110)
         {
             head.transform.localRotation = Quaternion.Euler(-75, 0, 0);
-       
         }
         if (head.transform.localRotation.eulerAngles.x > 75 && head.transform.localRotation.eulerAngles.x < 80)
         {
-
             head.transform.localRotation = Quaternion.Euler(75, 0, 0);
         }
 
@@ -175,31 +151,33 @@ public class PlayerMovement : MonoBehaviour
 		float currentFloorHeight = currentRoom.getFloorHeight();
 		bool playerInsideDimensionXZ = (currentDimensions.x/2 - Mathf.Abs(player.transform.position.x)) > 1.0f && (currentDimensions.z/2 - Mathf.Abs(player.transform.position.z)) > 1.0f;
 		bool playerInsideHeight = (player.transform.position.y - (currentFloorHeight + currentDimensions.y)) < -0.5;
+		bool playerWayTooHigh = (player.transform.position.y - (currentFloorHeight + currentDimensions.y)) > currentDimensions.y*2;
 
 		
 
-    	if(playerInsideHeight || playerInsideDimensionXZ)
-   			rg.velocity = vel;
+    	if(!playerWayTooHigh && (playerInsideHeight || playerInsideDimensionXZ)) {
+   			rg.velocity = new Vector3(targetVelocityXZ.x, rg.velocity.y, targetVelocityXZ.z);
+		}
 
 		if (Mathf.Abs(rg.velocity.x) > 0.2f || Mathf.Abs(rg.velocity.z) > 0.2f) {
 			anim.SetBool("Walk", true);
 		} else {
-			if (walk && anim.GetBool("Walk")) {
-				walkStopTime = 0.3f;
+			if (walkAnim && anim.GetBool("Walk")) {
+				walkAnimStopTime = 0.3f;
 			}
-			if (walkStopTime <= 0) {
+			if (walkAnimStopTime <= 0) {
 				anim.SetBool("Walk", false);
 			}
-			walk = false;
+			walkAnim = false;
 		}
       
     }
 
-    private void PeterSchreibHierDeinenRanzRein()
+    private void triggerReloadAnimation()
     {
-		if (!PeterCDDone) {
+		if (!reloadAnimDone) {
         	anim.SetTrigger("Reload");
-			PeterCDDone = true;
+			reloadAnimDone = true;
 		}
     }
 
@@ -217,10 +195,10 @@ public class PlayerMovement : MonoBehaviour
         }
         else { 
             shotty.Fire(this.gameObject.transform.position);
-            PeterCD = 0.400f;
+            reloadAnimTimeout = 0.400f;
             cd = 0.700f;
             isloaded = false;
-			PeterCDDone = false;
+			reloadAnimDone = false;
         }
 
 		anim.SetTrigger("Shoot");
@@ -241,7 +219,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void OnTriggerEnter(Collider other)
     {
       // Debug.Log(other.gameObject);
         switch (other.tag)
@@ -253,29 +231,37 @@ public class PlayerMovement : MonoBehaviour
               
             case "ChainsawNose":
                 Hit(20);
-                //  Destroy(other);
                 other.gameObject.GetComponentInParent<ChainsawNose>().Rest();
                 return;
             case "HealthUP":
                 health += 20;
-				other.gameObject.tag = "Empty";
+				other.gameObject.tag = "Untagged";
                 GameObject.Destroy( other.gameObject.GetComponentInParent<HealthPickup>().gameObject);
                 //Debug.Log(health);
                 return;
             case "SpeedUP":
                 SpeedUPActive = true;
-				other.gameObject.tag = "Empty";
+				other.gameObject.tag = "Untagged";
                 GameObject.Destroy(other.gameObject.GetComponentInParent<SpeedPickup>().gameObject);
                 SpeedUPDuration = 5f;
                 return;
             case "DamageUP":
                 DamageUPActive = true;
-				other.gameObject.tag = "Empty";
+				other.gameObject.tag = "Untagged";
                 GameObject.Destroy(other.gameObject.GetComponentInParent<DamagePickup>().gameObject);
                 DamageUPDuration = 5f;
                 return;
             default: return;
         }
-       
     }
+
+	public void OnCollisionStay(Collision collisionInfo) {
+		foreach (var item in collisionInfo.contacts)
+		{
+			if (item.point.y < player.transform.position.y + 0.25f) {
+				isGrounded = true;
+				groundedTimeout = 0.2f;
+			}
+		}
+	}
 }
