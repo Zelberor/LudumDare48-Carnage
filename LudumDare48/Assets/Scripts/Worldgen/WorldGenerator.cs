@@ -88,7 +88,7 @@ public class WorldGenerator : MonoBehaviour
 	}
 
 	private void updateNavMesh() {
-		float overlap = 0.2f;
+		float overlap = 0.5f;
 		if (navMesh == null) {
 			navMesh = this.gameObject.AddComponent<NavMeshSurface>();
 			navMesh.collectObjects = CollectObjects.Volume;

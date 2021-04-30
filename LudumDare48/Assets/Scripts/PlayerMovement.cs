@@ -90,7 +90,7 @@ public class PlayerMovement : MonoBehaviour
 		if (SpeedUPActive) {
         	movingSpeed = 20f;
 		} else {
-			movingSpeed = (isGrounded) ? 10f : 5f;
+			movingSpeed = (isGrounded) ? 10f : 7f;
 		}
 
         float lrInput = Input.GetAxisRaw("Horizontal");
@@ -122,7 +122,6 @@ public class PlayerMovement : MonoBehaviour
 
 		//Jumping
         if (jumpInput && isGrounded) {
-			Debug.Log("Jump");
 			jumpTime = 0.3f;
         } else if (!jumpInputHold) {
 			jumpTime = 0f;

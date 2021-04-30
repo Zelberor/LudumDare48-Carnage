@@ -8,8 +8,6 @@ public class ChainsawNose : MonoBehaviour
 {
 
     public GameObject healthPrefab, SpeedPrefab, DamagePrefab;
-
-    //private int health = 1000;
     private GameObject[] PowerUPprefabs;
     private int health=75;
     public Rigidbody rb;
@@ -26,9 +24,9 @@ public class ChainsawNose : MonoBehaviour
 
 	private bool dead = false;
 
-    NavMeshAgent mem;
-  //  public GameManager gm;
-  //  private bool usegm = true;
+	private bool isGrounded = false;
+	private float groundedTimeout = 0f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -42,40 +40,33 @@ public class ChainsawNose : MonoBehaviour
         downtime = 2.5f;
         player = GameObject.FindGameObjectWithTag("Player");
 		anim = this.GetComponentInChildren<Animator>();
+		agent = this.gameObject.GetComponent<NavMeshAgent>();
+		agent.updateUpAxis = false;
     }   
 
     // Update is called once per frame
     void Update()
     {
-        if((-0.25  > player.transform.position.y - this.gameObject.transform.position.y))
-        {
-            mem = this.gameObject.GetComponent<NavMeshAgent>();
-            this.gameObject.GetComponent<NavMeshAgent>().enabled = false;
-            rb.isKinematic = false;
-            return;
-        }
-        else 
-        {
-            this.gameObject.GetComponent<NavMeshAgent>().enabled = true;
-            if (downtime != 0)
-            {
-                rb.isKinematic = true;
-
-            }
-
-        }
-        if (downtime == 0 && agent.isOnNavMesh)
-            agent.destination = player.transform.position;
-        else {
-            downtime -= Time.deltaTime;
-            downtime = Mathf.Max(downtime, 0);
-            rb.isKinematic = true;
+		if (groundedTimeout > 0f)
+			groundedTimeout -= Time.deltaTime;
+		else
+			isGrounded = false;
+		
+        if((agent.pathStatus == NavMeshPathStatus.PathInvalid && !isGrounded) || dead || downtime > 0f) {
+			if (downtime > 0f)
+				downtime -= Time.deltaTime;
+			if (getAgentEnabled())
+            	setAgentEnabled(false);
+        } else {
+			if (!getAgentEnabled() && isGrounded) {
+            	setAgentEnabled(true);
+			}
 			if (agent.isOnNavMesh)
-            	agent.destination = player.gameObject.transform.position; 
+				agent.destination = player.transform.position;
         }
 
 		if (!dead) {
-			if (agent.hasPath && agent.destination != this.transform.position) {
+			if (agent.hasPath && agent.updatePosition && agent.destination != this.transform.position) {
 				anim.SetBool("Walk", true);
 			} else {
 				anim.SetBool("Walk", false);
@@ -83,8 +74,6 @@ public class ChainsawNose : MonoBehaviour
 
 			Vector2 xzPos = new Vector2(this.transform.position.x, this.transform.position.z);
 			Vector2 xzPlayerPos = new Vector2(player.transform.position.x, player.transform.position.z);
-
-
 			if ((xzPos - xzPlayerPos).magnitude < 2.5f ) {
 				anim.SetTrigger("Attack");
 			}
@@ -95,19 +84,10 @@ public class ChainsawNose : MonoBehaviour
     {
         //if hit, take a nap ;)
         downtime = 0.5f;
-        agent.destination = gameObject.transform.position;
-        rb.isKinematic = false;
-        
-    
-    
-    
-    
     }
-
 
     private void OnTriggerEnter(Collider other)
     {
-     //   Debug.Log("TriggerEnterEnemy");
         switch (other.tag)
         {
             case "ShellShrapnel":
@@ -115,7 +95,6 @@ public class ChainsawNose : MonoBehaviour
                 foreach (var item in other.gameObject.GetComponents<SphereCollider>())
                 {
                     item.enabled = false;
-
                 }
                 Destroy(other);
                 return;
@@ -124,7 +103,6 @@ public class ChainsawNose : MonoBehaviour
                 foreach (var item in other.gameObject.GetComponents<CapsuleCollider>())
                 {
                     item.enabled = false;
-
                 }
               	((Shell) other.gameObject).directShellHitOnShell();
                 return;
@@ -133,7 +111,6 @@ public class ChainsawNose : MonoBehaviour
                 foreach (var item in other.gameObject.GetComponents<BoxCollider>())
                 {
                     item.enabled = false;
-
                 }
                 Destroy(other);
                 break;
@@ -141,8 +118,6 @@ public class ChainsawNose : MonoBehaviour
                 Rest();
                 return;
             default: return;
-          
-
         }
     }
 
@@ -163,11 +138,10 @@ public class ChainsawNose : MonoBehaviour
     private void Killme()
     {
 		dead = true;
-        this.GetComponent<NavMeshAgent>().updatePosition = false;
-		this.GetComponent<NavMeshAgent>().updateRotation = false;
-        this.rb.isKinematic = false;
+       	setAgentEnabled(false);
         this.rb.useGravity = false;
-        rb.velocity = Vector3.zero;
+        rb.drag = 0.25f;
+		rb.angularDrag = 0.25f;
 
         this.rb.detectCollisions = false;
         this.GetComponent<BoxCollider>().enabled = false;
@@ -189,4 +163,25 @@ public class ChainsawNose : MonoBehaviour
 		anim.SetBool("Die", true);
         GameObject.Destroy(this.gameObject,5);
     }
+
+	private void setAgentEnabled(bool enabled) {
+		agent.updatePosition = enabled;
+		agent.updateRotation = enabled;
+		agent.enabled = enabled;
+		rb.isKinematic = enabled;
+	}
+
+	private bool getAgentEnabled() {
+		return agent.updatePosition && agent.updateRotation && rb.isKinematic && agent.enabled;
+	}
+
+	public void OnCollisionStay(Collision collisionInfo) {
+		foreach (var item in collisionInfo.contacts)
+		{
+			if (item.point.y < this.transform.position.y + 0.25f) {
+				isGrounded = true;
+				groundedTimeout = 0.2f;
+			}
+		}
+	}
 }

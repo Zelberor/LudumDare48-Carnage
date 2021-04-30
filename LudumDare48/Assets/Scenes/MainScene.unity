@@ -764,11 +764,11 @@ MonoBehaviour:
   transitionVariation: 2
   minTransition: 1
   chainsawNosePrefab: {fileID: 2043929975669025201, guid: ad122e5733cfaaf43924d78f760bf982, type: 3}
-  chainsawNoseProb: 0.01
+  chainsawNoseProb: 0.012
   maxChainsawNoses: 70
   cratePrefab: {fileID: 5507079414589768049, guid: af25ea179b398df42b1e45617fafaa13, type: 3}
-  crateProb: 0.04
-  maxCrates: 700
+  crateProb: 0.03
+  maxCrates: 400
   healthPrefab: {fileID: 6457270123646501771, guid: 54b0d414699834441849942a9388b052, type: 3}
   healthProb: 0.0008
   damagePrefab: {fileID: 2048164993878086895, guid: 0c917f5eb2cc2014299b7e4e3b54a2de, type: 3}
