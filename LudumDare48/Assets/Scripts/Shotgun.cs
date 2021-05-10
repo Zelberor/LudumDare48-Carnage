@@ -11,7 +11,7 @@ public class Shotgun : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Reload();
+        //Reload();
     }
 
     // Update is called once per frame
@@ -23,7 +23,7 @@ public class Shotgun : MonoBehaviour
         shells[1].transform.position = nSpawn.transform.position;
     }
 
-    internal void Reload(bool isDamageUPShot = false)
+    internal void Reload()
     {
         shells[0] = GameObject.Instantiate(preFap);
         shells[1] = GameObject.Instantiate(preFap);
