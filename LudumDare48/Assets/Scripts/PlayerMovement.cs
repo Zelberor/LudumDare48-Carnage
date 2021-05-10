@@ -17,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
     private float ImmunityFrames =0;
     private bool immunityFramesActive = false;
     private float cd;
-    private bool isloaded = true;
+    private bool isloaded = false;
     private bool SpeedUPActive = false;
     private float SpeedUPDuration =0f;
     private bool DamageUPActive = false;
@@ -114,7 +114,7 @@ public class PlayerMovement : MonoBehaviour
             cd = 0;
             if (!isloaded)
             {
-                shotty.Reload(DamageUPActive);
+                shotty.Reload();
                 isloaded = true;
 				shootReleased = false;
             }
@@ -195,17 +195,14 @@ public class PlayerMovement : MonoBehaviour
         if (!isloaded || !shootReleased)
             return;
 
-        if (DamageUPActive)
-        {
-            shotty.Fire(this.gameObject.transform.position);
+		shotty.Fire(this.gameObject.transform.position);
+		isloaded = false;
+        if (DamageUPActive) {
             cd = 0.15f;
-            isloaded = false;
         }
-        else { 
-            shotty.Fire(this.gameObject.transform.position);
+        else {  
             reloadAnimTimeout = 0.400f;
             cd = 0.700f;
-            isloaded = false;
 			reloadAnimDone = false;
         }
 
@@ -220,7 +217,7 @@ public class PlayerMovement : MonoBehaviour
             return;
         health -= dmg;
         immunityFramesActive = true;
-        ImmunityFrames = 1.5f;
+        ImmunityFrames = 1.0f;
         if (health <= 0)
         {
             GameManager.PlayerDed();
